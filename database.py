@@ -20,3 +20,11 @@ def initialize_db():
 if __name__ == "__main__":
     initialize_db()
     print("Database and Table created successfully!")
+
+    def add_book(title, author):
+    conn = sqlite3.connect("library.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO books (title, author) VALUES (?, ?)", (title, author))
+    conn.commit()
+    conn.close()
+    print(f"Book '{title}' added successfully!")
