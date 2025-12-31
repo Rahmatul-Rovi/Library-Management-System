@@ -18,7 +18,7 @@ def initialize_db():
     conn.commit()
     conn.close()
 
-# ২. বই সেভ করার ফাংশন (এটা main.py থেকে কল হবে)
+# ২. বই সেভ করার ফাংশন
 def add_book(title, author):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
@@ -27,7 +27,25 @@ def add_book(title, author):
     conn.close()
     print(f"Database logic: Book '{title}' added successfully!")
 
-# ৩. ফাইলটা রান করলে ডাটাবেস যাতে তৈরি হয়
+# ৩. সব বইয়ের লিস্ট নিয়ে আসার ফাংশন
+def get_all_books():
+    conn = sqlite3.connect("library.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM books")
+    books = cursor.fetchall()
+    conn.close()
+    return books
+
+# ৪. আইডি দিয়ে বই ডিলিট করার ফাংশন
+def delete_book(book_id):
+    conn = sqlite3.connect("library.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM books WHERE id = ?", (book_id,))
+    conn.commit()
+    conn.close()
+    print(f"Database logic: Book ID {book_id} deleted successfully!")
+
+# ফাইলটা সরাসরি রান করলে ডাটাবেস তৈরি হবে
 if __name__ == "__main__":
     initialize_db()
     print("Database and Table created successfully!")
