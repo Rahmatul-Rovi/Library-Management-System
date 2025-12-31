@@ -5,7 +5,7 @@ def initialize_db():
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
     
-    # Books Table তৈরি (বইয়ের মেইন লিস্ট)
+    # Books Table তৈরি (বইয়ের মেইন লিস্ট)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,7 +38,7 @@ def add_book(title, author):
     conn.close()
     print(f"Database logic: Book '{title}' added successfully!")
 
-# ৩. সব বইয়ের লিস্ট নিয়ে আসার ফাংশন
+# ৩. সব বইয়ের লিস্ট নিয়ে আসার ফাংশন
 def get_all_books():
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
@@ -47,16 +47,18 @@ def get_all_books():
     conn.close()
     return books
 
-# ৪. আইডি দিয়ে বই ডিলিট করার ফাংশন
+# ৪. আইডি দিয়ে বই ডিলিট করার ফাংশন
 def delete_book(book_id):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
     cursor.execute("DELETE FROM books WHERE id = ?", (book_id,))
+    # বই ডিলিট করলে যদি তা ইস্যু করা থাকে, সেই রেকর্ডও মুছে ফেলা ভালো
+    cursor.execute("DELETE FROM issued_books WHERE book_id = ?", (book_id,))
     conn.commit()
     conn.close()
     print(f"Database logic: Book ID {book_id} deleted successfully!")
 
-# ৫. নাম বা লেখকের নাম দিয়ে বই সার্চ করার ফাংশন
+# ৫. নাম বা লেখকের নাম দিয়ে বই সার্চ করার ফাংশন
 def search_books(query):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
@@ -66,12 +68,12 @@ def search_books(query):
     conn.close()
     return results
 
-# ৬. বই ধার দেওয়ার (Issue) ফাংশন
+# ৬. বই ধার দেওয়ার (Issue) ফাংশন
 def issue_book(book_id, member_name, member_contact):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
     
-    # বইয়ের স্ট্যাটাস 'Issued' করে দেওয়া
+    # বইয়ের স্ট্যাটাস 'Issued' করে দেওয়া
     cursor.execute("UPDATE books SET status = 'Issued' WHERE id = ?", (book_id,))
     
     # তথ্য সেভ করা
@@ -82,19 +84,34 @@ def issue_book(book_id, member_name, member_contact):
     conn.close()
     print(f"Database logic: Book ID {book_id} issued to {member_name}")
 
-# ৭. ইস্যু করা বইয়ের লিস্ট নিয়ে আসার ফাংশন
+# ৭. ইস্যু করা বইয়ের লিস্ট নিয়ে আসার ফাংশন
 def get_issued_books():
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
-    # JOIN ব্যবহার করে বইয়ের নামসহ তথ্য আনা
+    # JOIN ব্যবহার করে বইয়ের নামসহ তথ্য আনা
     cursor.execute("""
-        SELECT issued_books.issue_id, books.title, issued_books.member_name, issued_books.member_contact 
+        SELECT issued_books.issue_id, books.title, issued_books.member_name, issued_books.member_contact, books.id
         FROM issued_books 
         JOIN books ON issued_books.book_id = books.id
     """)
     data = cursor.fetchall()
     conn.close()
     return data
+
+# ৮. বই ফেরত নেওয়ার (Return) ফাংশন (নতুন যোগ করা হয়েছে)
+def return_book(book_id):
+    conn = sqlite3.connect("library.db")
+    cursor = conn.cursor()
+    
+    # ১. বইয়ের স্ট্যাটাস আবার 'Available' করে দেওয়া
+    cursor.execute("UPDATE books SET status = 'Available' WHERE id = ?", (book_id,))
+    
+    # ২. ইস্যু টেবিল থেকে ওই বইয়ের রেকর্ড ডিলিট করা
+    cursor.execute("DELETE FROM issued_books WHERE book_id = ?", (book_id,))
+    
+    conn.commit()
+    conn.close()
+    print(f"Database logic: Book ID {book_id} returned successfully!")
 
 # ফাইলটা সরাসরি রান করলে ডাটাবেস তৈরি হবে
 if __name__ == "__main__":
