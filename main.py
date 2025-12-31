@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from database import (initialize_db, add_book, get_all_books, 
-                      delete_book, search_books, issue_book, get_issued_books)
+                      delete_book, search_books, issue_book, 
+                      get_issued_books, return_book) # return_book ইমপোর্ট করলাম
 
 # Initialize Database
 initialize_db()
@@ -14,7 +15,7 @@ class LibraryApp(ctk.CTk):
         super().__init__()
 
         self.title("Library Management System Pro")
-        self.geometry("650x950") # ফিচার বাড়ায় সাইজ বাড়িয়েছি
+        self.geometry("650x980") # হাইট আরেকটু বাড়ালাম রিটার্ন সেকশনের জন্য
 
         # --- মেইন টাইটেল ---
         self.label = ctk.CTkLabel(self, text="Library Management System", font=("Arial", 24, "bold"))
@@ -47,9 +48,9 @@ class LibraryApp(ctk.CTk):
         self.status_label = ctk.CTkLabel(self, text="System Ready", font=("Arial", 14), text_color="gray")
         self.status_label.pack(pady=5)
 
-        # --- ৪. বই ধার দেওয়ার সেকশন (নতুন) ---
+        # --- ৪. বই ধার দেওয়ার সেকশন ---
         self.issue_frame = ctk.CTkFrame(self, border_width=2, border_color="gray")
-        self.issue_frame.pack(pady=15, padx=20, fill="x")
+        self.issue_frame.pack(pady=10, padx=20, fill="x")
 
         self.issue_title = ctk.CTkLabel(self.issue_frame, text="Issue Book to Member", font=("Arial", 14, "bold"))
         self.issue_title.pack(pady=5)
@@ -66,7 +67,20 @@ class LibraryApp(ctk.CTk):
         self.issue_btn = ctk.CTkButton(self.issue_frame, text="Issue", width=80, command=self.issue_book_ui, fg_color="green")
         self.issue_btn.pack(side="left", padx=10)
 
-        # --- ৫. ডাটা দেখার বাটন সমূহ ---
+        # --- ৫. বই ফেরত দেওয়ার সেকশন (নতুন) ---
+        self.return_frame = ctk.CTkFrame(self, border_width=2, border_color="#3B8ED0")
+        self.return_frame.pack(pady=10, padx=20, fill="x")
+
+        self.return_title = ctk.CTkLabel(self.return_frame, text="Return Book", font=("Arial", 14, "bold"))
+        self.return_title.pack(side="left", padx=20, pady=10)
+
+        self.return_id_entry = ctk.CTkEntry(self.return_frame, placeholder_text="Enter Book ID", width=150)
+        self.return_id_entry.pack(side="left", padx=10)
+
+        self.return_btn = ctk.CTkButton(self.return_frame, text="Confirm Return", width=120, command=self.return_book_ui)
+        self.return_btn.pack(side="left", padx=20)
+
+        # --- ৬. ডাটা দেখার বাটন সমূহ ---
         self.btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.btn_frame.pack(pady=10)
 
@@ -76,11 +90,11 @@ class LibraryApp(ctk.CTk):
         self.issued_view_btn = ctk.CTkButton(self.btn_frame, text="View Issued Books", command=self.show_issued_books_ui, fg_color="teal")
         self.issued_view_btn.pack(side="left", padx=10)
 
-        # --- ৬. মেইন ডিসপ্লে (টেক্সটবক্স) ---
-        self.book_display = ctk.CTkTextbox(self, width=600, height=200, font=("Courier New", 13))
+        # --- ৭. মেইন ডিসপ্লে (টেক্সটবক্স) ---
+        self.book_display = ctk.CTkTextbox(self, width=600, height=180, font=("Courier New", 13))
         self.book_display.pack(pady=10)
 
-        # --- ৭. ডিলিট করার সেকশন ---
+        # --- ৮. ডিলিট করার সেকশন ---
         self.delete_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.delete_frame.pack(pady=10)
 
@@ -114,6 +128,16 @@ class LibraryApp(ctk.CTk):
             self.show_books()
         else:
             self.status_label.configure(text="Fill all Issue fields!", text_color="red")
+
+    def return_book_ui(self):
+        bid = self.return_id_entry.get()
+        if bid:
+            return_book(bid)
+            self.status_label.configure(text=f"Book ID {bid} Returned Successfully!", text_color="yellow")
+            self.return_id_entry.delete(0, 'end')
+            self.show_books()
+        else:
+            self.status_label.configure(text="Enter ID to return!", text_color="red")
 
     def show_books(self):
         records = get_all_books()
