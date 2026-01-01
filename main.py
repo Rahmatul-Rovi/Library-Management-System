@@ -3,9 +3,10 @@ from database import (initialize_db, add_book, get_all_books,
                       delete_book, search_books, issue_book, 
                       get_issued_books, return_book, get_stats, export_books_to_file)
 
-# Initialize Database
+# ১. ডাটাবেস ইনিশিয়ালাইজ করা
 initialize_db()
 
+# ২. অ্যাপ থিম সেটআপ
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -108,7 +109,7 @@ class LibraryApp(ctk.CTk):
         self.delete_btn = ctk.CTkButton(self.delete_frame, text="Delete Book", width=120, command=self.delete_book_ui, fg_color="red")
         self.delete_btn.pack(side="left")
 
-    # --- Functions ---
+    # --- ফাংশন সমূহ ---
 
     def update_dashboard(self):
         total, issued = get_stats()
@@ -122,7 +123,8 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"'{title}' added!", text_color="lightgreen")
             self.title_entry.delete(0, 'end'); self.author_entry.delete(0, 'end')
             self.show_books(); self.update_dashboard()
-        else: self.status_label.configure(text="Fill Title and Author!", text_color="red")
+        else:
+            self.status_label.configure(text="Fill Title and Author!", text_color="red")
 
     def issue_book_ui(self):
         bid, name = self.issue_book_id.get(), self.member_name.get()
@@ -131,7 +133,8 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"ID {bid} issued to {name}", text_color="cyan")
             self.issue_book_id.delete(0, 'end'); self.member_name.delete(0, 'end')
             self.show_books(); self.update_dashboard()
-        else: self.status_label.configure(text="Enter ID and Member Name!", text_color="red")
+        else:
+            self.status_label.configure(text="Enter ID and Member Name!", text_color="red")
 
     def return_book_ui(self):
         bid = self.return_id_entry.get()
@@ -153,7 +156,7 @@ class LibraryApp(ctk.CTk):
         records = get_issued_books()
         self.book_display.delete("1.0", "end")
         self.book_display.insert("end", "--- Currently Issued Books ---\n\n")
-        header = f"{'I_ID':<5} | {'Title':<25} | {'Member Name':<15} | {'Contact'}\n"
+        header = f"{'I_ID':<5} | {'Book Title':<25} | {'Member Name':<15} | {'Contact'}\n"
         self.book_display.insert("end", header + "-"*75 + "\n")
         for r in records:
             self.book_display.insert("end", f"{r[0]:<5} | {r[1]:<25} | {r[2]:<15} | {r[3]}\n")
