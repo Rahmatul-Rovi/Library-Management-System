@@ -1,0 +1,9 @@
+========== LIBRARY BOOKS REPORT ==========
+
+ID    | Title                          | Author               | Status
+---------------------------------------------------------------------------
+1     | Chemistry                      | Rahmatul-Rovi        | Available
+2     | Biology                        | Alif                 | Issued
+3     | Mathematics                    | Mubashsher Salek     | Available
+
+==========================================
