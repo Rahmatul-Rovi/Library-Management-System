@@ -3,7 +3,7 @@
 ID    | Title                          | Author               | Status
 ---------------------------------------------------------------------------
 1     | Chemistry                      | Rahmatul-Rovi        | Available
-2     | Biology                        | Alif                 | Issued
+2     | Biology                        | Alif                 | Available
 3     | Mathematics                    | Mubashsher Salek     | Available
 
 ==========================================
