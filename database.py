@@ -69,7 +69,7 @@ def search_books(query):
     return results
 
 # ৬. বই ধার দেওয়ার (Issue) ফাংশন
-def issue_book(book_id, member_name, member_contact):
+def issue_book(book_id, member_name, member_contact="N/A"):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
     
@@ -88,7 +88,6 @@ def issue_book(book_id, member_name, member_contact):
 def get_issued_books():
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
-    # JOIN ব্যবহার করে বইয়ের নামসহ তথ্য আনা
     cursor.execute("""
         SELECT issued_books.issue_id, books.title, issued_books.member_name, issued_books.member_contact, books.id
         FROM issued_books 
@@ -113,23 +112,34 @@ def return_book(book_id):
     conn.close()
     print(f"Database logic: Book ID {book_id} returned successfully!")
 
-# ৯. ড্যাশবোর্ডের জন্য স্ট্যাটাস কাউন্ট করার ফাংশন (নতুন)
+# ৯. ড্যাশবোর্ডের জন্য স্ট্যাটাস কাউন্ট করার ফাংশন
 def get_stats():
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
-    
-    # মোট কয়টি বই আছে
     cursor.execute("SELECT COUNT(*) FROM books")
     total_books = cursor.fetchone()[0]
-    
-    # কয়টি বই বর্তমানে ইস্যু করা আছে
     cursor.execute("SELECT COUNT(*) FROM books WHERE status = 'Issued'")
     issued_books = cursor.fetchone()[0]
-    
     conn.close()
     return total_books, issued_books
+
+# ১০. নতুন: লাইব্রেরি রিপোর্ট এক্সপোর্ট করার ফাংশন (Text File)
+def export_books_to_file():
+    books = get_all_books()
+    try:
+        with open("library_report.txt", "w", encoding="utf-8") as f:
+            f.write("========== LIBRARY BOOKS REPORT ==========\n\n")
+            f.write(f"{'ID':<5} | {'Title':<30} | {'Author':<20} | {'Status'}\n")
+            f.write("-" * 75 + "\n")
+            for b in books:
+                f.write(f"{b[0]:<5} | {b[1]:<30} | {b[2]:<20} | {b[3]}\n")
+            f.write("\n==========================================\n")
+        return True
+    except Exception as e:
+        print(f"Error exporting: {e}")
+        return False
 
 # ফাইলটা সরাসরি রান করলে ডাটাবেস তৈরি হবে
 if __name__ == "__main__":
     initialize_db()
-    print("Database and Tables created successfully!")
+    print("Database and Tables updated successfully!")
