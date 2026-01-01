@@ -98,7 +98,7 @@ def get_issued_books():
     conn.close()
     return data
 
-# ৮. বই ফেরত নেওয়ার (Return) ফাংশন (নতুন যোগ করা হয়েছে)
+# ৮. বই ফেরত নেওয়ার (Return) ফাংশন
 def return_book(book_id):
     conn = sqlite3.connect("library.db")
     cursor = conn.cursor()
@@ -112,6 +112,22 @@ def return_book(book_id):
     conn.commit()
     conn.close()
     print(f"Database logic: Book ID {book_id} returned successfully!")
+
+# ৯. ড্যাশবোর্ডের জন্য স্ট্যাটাস কাউন্ট করার ফাংশন (নতুন)
+def get_stats():
+    conn = sqlite3.connect("library.db")
+    cursor = conn.cursor()
+    
+    # মোট কয়টি বই আছে
+    cursor.execute("SELECT COUNT(*) FROM books")
+    total_books = cursor.fetchone()[0]
+    
+    # কয়টি বই বর্তমানে ইস্যু করা আছে
+    cursor.execute("SELECT COUNT(*) FROM books WHERE status = 'Issued'")
+    issued_books = cursor.fetchone()[0]
+    
+    conn.close()
+    return total_books, issued_books
 
 # ফাইলটা সরাসরি রান করলে ডাটাবেস তৈরি হবে
 if __name__ == "__main__":
