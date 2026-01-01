@@ -1,12 +1,11 @@
 import customtkinter as ctk
 from database import (initialize_db, add_book, get_all_books, 
                       delete_book, search_books, issue_book, 
-                      get_issued_books, return_book) # return_book ইমপোর্ট করলাম
+                      get_issued_books, return_book, get_stats) # get_stats যোগ করা হয়েছে
 
 # Initialize Database
 initialize_db()
 
-# App Appearance Settings
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -15,17 +14,29 @@ class LibraryApp(ctk.CTk):
         super().__init__()
 
         self.title("Library Management System Pro")
-        self.geometry("650x980") # হাইট আরেকটু বাড়ালাম রিটার্ন সেকশনের জন্য
+        self.geometry("680x1000") 
 
         # --- মেইন টাইটেল ---
-        self.label = ctk.CTkLabel(self, text="Library Management System", font=("Arial", 24, "bold"))
-        self.label.pack(pady=20)
+        self.label = ctk.CTkLabel(self, text="Library Management System", font=("Arial", 26, "bold"))
+        self.label.pack(pady=15)
+
+        # --- ড্যাশবোর্ড সেকশন (Stats) ---
+        self.stats_frame = ctk.CTkFrame(self, fg_color="#2b2b2b")
+        self.stats_frame.pack(pady=10, padx=20, fill="x")
+
+        self.total_books_label = ctk.CTkLabel(self.stats_frame, text="Total Books: 0", font=("Arial", 14, "bold"), text_color="white")
+        self.total_books_label.pack(side="left", padx=50, pady=10)
+
+        self.issued_books_label = ctk.CTkLabel(self.stats_frame, text="Issued: 0", font=("Arial", 14, "bold"), text_color="#FFCC00")
+        self.issued_books_label.pack(side="left", padx=50, pady=10)
+        
+        self.update_dashboard() # অ্যাপ খোলার সময় ডাটা লোড হবে
 
         # --- ১. সার্চ সেকশন ---
         self.search_frame = ctk.CTkFrame(self)
         self.search_frame.pack(pady=10, padx=20, fill="x")
 
-        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by Title or Author", width=300)
+        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by Title or Author", width=350)
         self.search_entry.pack(side="left", padx=10, pady=10)
 
         self.search_btn = ctk.CTkButton(self.search_frame, text="Search", width=100, command=self.search_book_ui, fg_color="purple")
@@ -67,7 +78,7 @@ class LibraryApp(ctk.CTk):
         self.issue_btn = ctk.CTkButton(self.issue_frame, text="Issue", width=80, command=self.issue_book_ui, fg_color="green")
         self.issue_btn.pack(side="left", padx=10)
 
-        # --- ৫. বই ফেরত দেওয়ার সেকশন (নতুন) ---
+        # --- ৫. বই ফেরত দেওয়ার সেকশন ---
         self.return_frame = ctk.CTkFrame(self, border_width=2, border_color="#3B8ED0")
         self.return_frame.pack(pady=10, padx=20, fill="x")
 
@@ -91,7 +102,7 @@ class LibraryApp(ctk.CTk):
         self.issued_view_btn.pack(side="left", padx=10)
 
         # --- ৭. মেইন ডিসপ্লে (টেক্সটবক্স) ---
-        self.book_display = ctk.CTkTextbox(self, width=600, height=180, font=("Courier New", 13))
+        self.book_display = ctk.CTkTextbox(self, width=620, height=200, font=("Courier New", 13))
         self.book_display.pack(pady=10)
 
         # --- ৮. ডিলিট করার সেকশন ---
@@ -106,6 +117,11 @@ class LibraryApp(ctk.CTk):
 
     # --- ফাংশন সমূহ ---
 
+    def update_dashboard(self):
+        total, issued = get_stats()
+        self.total_books_label.configure(text=f"Total Books: {total}")
+        self.issued_books_label.configure(text=f"Issued: {issued}")
+
     def save_book_data(self):
         title = self.title_entry.get()
         author = self.author_entry.get()
@@ -114,6 +130,7 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"'{title}' saved!", text_color="lightgreen")
             self.title_entry.delete(0, 'end'); self.author_entry.delete(0, 'end')
             self.show_books()
+            self.update_dashboard()
         else:
             self.status_label.configure(text="Fill all fields!", text_color="red")
 
@@ -126,6 +143,7 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"ID {bid} issued to {mname}", text_color="cyan")
             self.issue_book_id.delete(0, 'end'); self.member_name.delete(0, 'end'); self.member_contact.delete(0, 'end')
             self.show_books()
+            self.update_dashboard()
         else:
             self.status_label.configure(text="Fill all Issue fields!", text_color="red")
 
@@ -136,6 +154,7 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"Book ID {bid} Returned Successfully!", text_color="yellow")
             self.return_id_entry.delete(0, 'end')
             self.show_books()
+            self.update_dashboard()
         else:
             self.status_label.configure(text="Enter ID to return!", text_color="red")
 
@@ -174,6 +193,7 @@ class LibraryApp(ctk.CTk):
             self.status_label.configure(text=f"Book ID {bid} deleted!", text_color="orange")
             self.delete_entry.delete(0, 'end')
             self.show_books()
+            self.update_dashboard()
 
 if __name__ == "__main__":
     app = LibraryApp()
