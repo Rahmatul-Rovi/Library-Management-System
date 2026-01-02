@@ -1,0 +1,9 @@
+========== LIBRARY BOOKS REPORT ==========
+
+ID    | Title                          | Author               | Status
+---------------------------------------------------------------------------
+1     | Mathematics                    | Rovi                 | Available
+2     | Calculus                       | Ashik                | Issued
+3     | Biology                        | Bijoy                | Available
+
+==========================================
