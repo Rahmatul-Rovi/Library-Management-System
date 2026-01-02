@@ -3,10 +3,8 @@ from database import (initialize_db, add_book, get_all_books,
                       delete_book, search_books, issue_book, 
                       get_issued_books, return_book, get_stats, export_books_to_file)
 
-# ১. ডাটাবেস ইনিশিয়ালাইজ করা
 initialize_db()
 
-# ২. অ্যাপ থিম সেটআপ
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -17,11 +15,9 @@ class LibraryApp(ctk.CTk):
         self.title("Library Management System Pro")
         self.geometry("700x950") 
 
-        # --- মেইন টাইটেল ---
         self.label = ctk.CTkLabel(self, text="Library Management System", font=("Arial", 28, "bold"))
         self.label.pack(pady=15)
 
-        # --- ড্যাশবোর্ড সেকশন (Stats) ---
         self.stats_frame = ctk.CTkFrame(self, fg_color="#1e1e1e", corner_radius=10)
         self.stats_frame.pack(pady=10, padx=20, fill="x")
 
@@ -33,7 +29,6 @@ class LibraryApp(ctk.CTk):
         
         self.update_dashboard()
 
-        # --- ১. সার্চ সেকশন ---
         self.search_frame = ctk.CTkFrame(self)
         self.search_frame.pack(pady=10, padx=20, fill="x")
 
@@ -43,7 +38,6 @@ class LibraryApp(ctk.CTk):
         self.search_btn = ctk.CTkButton(self.search_frame, text="Search", width=100, command=self.search_book_ui, fg_color="purple")
         self.search_btn.pack(side="left", padx=10)
 
-        # --- ২. বই যোগ করার সেকশন ---
         self.add_frame = ctk.CTkFrame(self)
         self.add_frame.pack(pady=10, padx=20, fill="x")
 
@@ -56,11 +50,9 @@ class LibraryApp(ctk.CTk):
         self.save_btn = ctk.CTkButton(self.add_frame, text="Add Book", width=100, fg_color="green", command=self.save_book_data)
         self.save_btn.pack(side="left", padx=10)
 
-        # --- ৩. স্ট্যাটাস মেসেজ ---
         self.status_label = ctk.CTkLabel(self, text="System Ready", font=("Arial", 14), text_color="gray")
         self.status_label.pack(pady=5)
 
-        # --- ৪. বই ধার দেওয়ার সেকশন (Issue) ---
         self.issue_frame = ctk.CTkFrame(self, border_width=1, border_color="gray")
         self.issue_frame.pack(pady=10, padx=20, fill="x")
 
@@ -73,7 +65,6 @@ class LibraryApp(ctk.CTk):
         self.issue_btn = ctk.CTkButton(self.issue_frame, text="Issue Book", width=100, command=self.issue_book_ui)
         self.issue_btn.pack(side="left", padx=10)
 
-        # --- ৫. অপারেশন বাটনস (Return & Export) ---
         self.op_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.op_frame.pack(pady=10)
 
@@ -86,7 +77,6 @@ class LibraryApp(ctk.CTk):
         self.export_btn = ctk.CTkButton(self.op_frame, text="Export List (.txt)", width=130, fg_color="teal", command=self.export_data_ui)
         self.export_btn.pack(side="left", padx=5)
 
-        # --- ৬. ডাটা ডিসপ্লে ---
         self.view_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.view_frame.pack(pady=5)
         
@@ -99,7 +89,6 @@ class LibraryApp(ctk.CTk):
         self.book_display = ctk.CTkTextbox(self, width=640, height=250, font=("Courier New", 13))
         self.book_display.pack(pady=10)
 
-        # --- ৭. ডিলিট সেকশন ---
         self.delete_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.delete_frame.pack(pady=10)
 
@@ -108,8 +97,6 @@ class LibraryApp(ctk.CTk):
 
         self.delete_btn = ctk.CTkButton(self.delete_frame, text="Delete Book", width=120, command=self.delete_book_ui, fg_color="red")
         self.delete_btn.pack(side="left")
-
-    # --- ফাংশন সমূহ ---
 
     def update_dashboard(self):
         total, issued = get_stats()
