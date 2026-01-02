@@ -2,25 +2,19 @@ import sqlite3
 import os
 import sys
 
-# ১. ডাটাবেস ফাইল পাথ ডাইনামিক করার ফাংশন
 def get_db_path():
-    """ এটি নিশ্চিত করবে যে .exe হওয়ার পরও সফটওয়্যার তার পাশের ডাটাবেস ফাইলটি খুঁজে পাবে """
     if getattr(sys, 'frozen', False):
-        # যদি .exe ফাইল হিসেবে চলে
         base_path = os.path.dirname(sys.executable)
     else:
-        # যদি নরমাল পাইথন ফাইল হিসেবে চলে
         base_path = os.path.dirname(os.path.abspath(__file__))
     
     return os.path.join(base_path, "library.db")
 
-# ২. ডাটাবেস এবং টেবিল তৈরি করার ফাংশন
 def initialize_db():
     db_path = get_db_path()
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         
-        # Books Table তৈরি
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +24,6 @@ def initialize_db():
             )
         """)
 
-        # Issued Books Table তৈরি
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS issued_books (
                 issue_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,21 +36,18 @@ def initialize_db():
         conn.commit()
     print(f"Database Initialized at: {db_path}")
 
-# ৩. নতুন বই সেভ করার ফাংশন
 def add_book(title, author):
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO books (title, author) VALUES (?, ?)", (title, author))
         conn.commit()
 
-# ৪. সব বইয়ের লিস্ট নিয়ে আসার ফাংশন
 def get_all_books():
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM books")
         return cursor.fetchall()
 
-# ৫. আইডি দিয়ে বই ডিলিট করার ফাংশন
 def delete_book(book_id):
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -65,7 +55,6 @@ def delete_book(book_id):
         cursor.execute("DELETE FROM issued_books WHERE book_id = ?", (book_id,))
         conn.commit()
 
-# ৬. নাম বা লেখকের নাম দিয়ে বই সার্চ করার ফাংশন
 def search_books(query):
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -73,7 +62,6 @@ def search_books(query):
                        ('%' + query + '%', '%' + query + '%'))
         return cursor.fetchall()
 
-# ৭. বই ধার দেওয়ার (Issue) ফাংশন
 def issue_book(book_id, member_name, member_contact="N/A"):
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -82,7 +70,6 @@ def issue_book(book_id, member_name, member_contact="N/A"):
                        (book_id, member_name, member_contact))
         conn.commit()
 
-# ৮. ইস্যু করা বইয়ের লিস্ট নিয়ে আসার ফাংশন
 def get_issued_books():
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -93,7 +80,6 @@ def get_issued_books():
         """)
         return cursor.fetchall()
 
-# ৯. বই ফেরত নেওয়ার (Return) ফাংশন
 def return_book(book_id):
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -101,7 +87,6 @@ def return_book(book_id):
         cursor.execute("DELETE FROM issued_books WHERE book_id = ?", (book_id,))
         conn.commit()
 
-# ১০. ড্যাশবোর্ডের জন্য স্ট্যাটাস কাউন্ট করার ফাংশন
 def get_stats():
     with sqlite3.connect(get_db_path()) as conn:
         cursor = conn.cursor()
@@ -111,10 +96,8 @@ def get_stats():
         issued = cursor.fetchone()[0]
         return total, issued
 
-# ১১. লাইব্রেরি রিপোর্ট এক্সপোর্ট করার ফাংশন
 def export_books_to_file():
     books = get_all_books()
-    # এক্সপোর্ট ফাইলটিও সফটওয়্যারের পাশেই সেভ হবে
     export_path = os.path.join(os.path.dirname(get_db_path()), "library_report.txt")
     try:
         with open(export_path, "w", encoding="utf-8") as f:
